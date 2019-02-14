@@ -100,25 +100,25 @@
 
 
 
-  <meta name="description" content="sec1this is just a test body use next theme">
+  <meta name="description" content="之前雄心勃勃的从GitHub上下了Hadoop源码，想要通读涨涨姿势，甚至想自己写一个简易版本。不料代码啃起来味同嚼蜡，在读了基本的RPC之后，就此搁置。 后来，抱着没有干不好的事，只有打开方式不对的心态，换个姿势，再学一次。这次计划如下：  首先，将代码在本地调试。 然后，按模块进行debug。  今天主要说第一块的探索，花了两个晚上:&amp;gt;。  git fork下源码，git clone到本">
 <meta name="keywords" content="programme, python, java, big data">
 <meta property="og:type" content="article">
-<meta property="og:title" content="first test">
-<meta property="og:url" content="https://qtmuniao.github.io/2019/02/14/first-test/index.html">
+<meta property="og:title" content="Hadoop-0.1.0代码调试运行">
+<meta property="og:url" content="https://qtmuniao.github.io/2017/06/29/hadoop-0.1.0-code-debug/index.html">
 <meta property="og:site_name" content="香远益清">
-<meta property="og:description" content="sec1this is just a test body use next theme">
+<meta property="og:description" content="之前雄心勃勃的从GitHub上下了Hadoop源码，想要通读涨涨姿势，甚至想自己写一个简易版本。不料代码啃起来味同嚼蜡，在读了基本的RPC之后，就此搁置。 后来，抱着没有干不好的事，只有打开方式不对的心态，换个姿势，再学一次。这次计划如下：  首先，将代码在本地调试。 然后，按模块进行debug。  今天主要说第一块的探索，花了两个晚上:&amp;gt;。  git fork下源码，git clone到本">
 <meta property="og:locale" content="zh, en">
-<meta property="og:updated_time" content="2019-02-14T12:13:08.887Z">
+<meta property="og:updated_time" content="2017-06-27T15:24:00.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="first test">
-<meta name="twitter:description" content="sec1this is just a test body use next theme">
+<meta name="twitter:title" content="Hadoop-0.1.0代码调试运行">
+<meta name="twitter:description" content="之前雄心勃勃的从GitHub上下了Hadoop源码，想要通读涨涨姿势，甚至想自己写一个简易版本。不料代码啃起来味同嚼蜡，在读了基本的RPC之后，就此搁置。 后来，抱着没有干不好的事，只有打开方式不对的心态，换个姿势，再学一次。这次计划如下：  首先，将代码在本地调试。 然后，按模块进行debug。  今天主要说第一块的探索，花了两个晚上:&amp;gt;。  git fork下源码，git clone到本">
 
 
 
 
 
 
-  <link rel="canonical" href="https://qtmuniao.github.io/2019/02/14/first-test/">
+  <link rel="canonical" href="https://qtmuniao.github.io/2017/06/29/hadoop-0.1.0-code-debug/">
 
 
 
@@ -128,7 +128,7 @@
   };
 </script>
 
-  <title>first test | 香远益清</title>
+  <title>Hadoop-0.1.0代码调试运行 | 香远益清</title>
   
 
 
@@ -297,7 +297,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://qtmuniao.github.io/blog/2019/02/14/first-test/">
+    <link itemprop="mainEntityOfPage" href="https://qtmuniao.github.io/blog/2017/06/29/hadoop-0.1.0-code-debug/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="qingtengmuniao">
@@ -314,7 +314,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">first test
+          <h1 class="post-title" itemprop="name headline">Hadoop-0.1.0代码调试运行
 
               
             
@@ -340,12 +340,24 @@
                 
               
 
-              <time title="Created: 2019-02-14 17:04:44 / Modified: 20:13:08" itemprop="dateCreated datePublished" datetime="2019-02-14T17:04:44+08:00">2019-02-14</time>
+              <time title="Created: 2017-06-29 00:00:00" itemprop="dateCreated datePublished" datetime="2017-06-29T00:00:00+08:00">2017-06-29</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2017-06-27 23:24:00" itemprop="dateModified" datetime="2017-06-27T23:24:00+08:00">2017-06-27</time>
               
             
           </span>
@@ -379,8 +391,35 @@
       
 
       
-        <h1 id="sec1"><a href="#sec1" class="headerlink" title="sec1"></a>sec1</h1><p>this is just a test body</p>
-<p>use next theme</p>
+        <p>之前雄心勃勃的从GitHub上下了Hadoop源码，想要通读涨涨姿势，甚至想自己写一个简易版本。<br>不料代码啃起来味同嚼蜡，在读了基本的RPC之后，就此搁置。</p>
+<p>后来，抱着没有干不好的事，只有打开方式不对的心态，换个姿势，再学一次。<br>这次计划如下：</p>
+<ol>
+<li>首先，将代码在本地调试。</li>
+<li>然后，按模块进行debug。</li>
+</ol>
+<p>今天主要说第一块的探索，花了两个晚上:&gt;。</p>
+<ul>
+<li><code>git fork</code>下源码，<code>git clone</code>到本地，通过<code>git tag --list</code> 查看所有标签，找到<strong>0.1.0</strong>版本。<br>并且checkout出来。</li>
+<li>配置JAVA_HOME，HADOOP_HOME, PATH环境变量。</li>
+<li>下载安装ant，并且配置环境变量(ANT_HOME,PATH)</li>
+<li>Eclipse新建<strong>Java Project</strong>，然后选择<strong>Java Project From Existing Ant Buildfile</strong>,<br>从现有文件夹中打开，选择hadoop所在文件夹，它会自动识别出build.xml，然后新建Ant工程。</li>
+<li>右击build.xml，<strong>run as-&gt; ant built</strong>，选第二个，进行配置（选对运行文件夹以及build文件，如果<br>不行就在含build.xml目录中执行命令ant，然后就会生成build文件夹，并且根据conf文件夹模板生成<br>必要的conf文件。</li>
+<li><p>修改hadoop脚本（在<strong>${HADOOP_HOME}/bin</strong>里），为了不破坏原来文件，<code>cp hadoop hadoop-debug</code>。<br>然后在此脚本中，将最后一行运行命令，加上一些用于调试的参数。修改如下</p>
+<ul>
+<li><p>修改前</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> run it</span><br><span class="line">exec "$JAVA" $JAVA_HEAP_MAX $HADOOP_OPTS -classpath "$CLASSPATH" $CLASS "$@"</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改后</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> run it</span><br><span class="line">exec "$JAVA" -Xdebug -Xrunjdwp:transport=dt_socket,address=9090,server=y,suspend=y </span><br><span class="line"><span class="meta">$</span>JAVA_HEAP_MAX $HADOOP_OPTS -classpath "$CLASSPATH" $CLASS "$@"</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>-Xdebug指明是调试，-Xrunjdwp引出后面参数。transport:通信方式，address：端口。</p>
+</li>
+</ul>
+</li>
+<li>然后选择一个模块运行，比如NameNode：<code>bin/hadoop-debug namenode -format</code>。</li>
+<li>在Eclipse中选择<strong>Debug-&gt;Debug configurations-&gt;Remote Java Application</strong>，选择对工程，localhost<br>以及<strong>对应</strong>端口就行。记得在代码中加断点，然后就可以愉快地运行了。</li>
+</ul>
+<p>夜深啦，今天先到这里。</p>
 
       
     </div>
@@ -411,15 +450,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/blog/2019/02/14/hello-world/" rel="next" title="Hello World">
-                <i class="fa fa-chevron-left"></i> Hello World
-              </a>
-            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2017/07/02/hadoop-source-DFS/" rel="prev" title="Hadoop 源码阅读之DFS（一）：一些基本的类">
+                Hadoop 源码阅读之DFS（一）：一些基本的类 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -464,17 +503,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
-          </li>
-        </ul>
-      
 
-      <div class="site-overview-wrap sidebar-panel">
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
@@ -539,23 +569,6 @@
         </div>
       </div>
 
-      
-      <!--noindex-->
-        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-            
-            
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#sec1"><span class="nav-number">1.</span> <span class="nav-text">sec1</span></a></li></ol></div>
-            
-
-          </div>
-        </div>
-      <!--/noindex-->
       
 
       

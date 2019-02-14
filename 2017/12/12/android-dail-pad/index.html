@@ -100,25 +100,25 @@
 
 
 
-  <meta name="description" content="sec1this is just a test body use next theme">
+  <meta name="description" content="问题在进行模块化的时候，试图将诸如SearchListener, CallManager 的模块从MainActivity中拆出来，然而在响应事件的时候，不可避免的需要改变其他资源状态，那么就需要获取其句柄。由此还需要把MainActivity作为句柄传入代码。 更令人纠结的是，由于存在一些异步事件（如申请权限），其触发在模块（CallManager）中，其接受在主体视图（MainActivity">
 <meta name="keywords" content="programme, python, java, big data">
 <meta property="og:type" content="article">
-<meta property="og:title" content="first test">
-<meta property="og:url" content="https://qtmuniao.github.io/2019/02/14/first-test/index.html">
+<meta property="og:title" content="Android 学习笔记（二）：代码组织">
+<meta property="og:url" content="https://qtmuniao.github.io/2017/12/12/android-dail-pad/index.html">
 <meta property="og:site_name" content="香远益清">
-<meta property="og:description" content="sec1this is just a test body use next theme">
+<meta property="og:description" content="问题在进行模块化的时候，试图将诸如SearchListener, CallManager 的模块从MainActivity中拆出来，然而在响应事件的时候，不可避免的需要改变其他资源状态，那么就需要获取其句柄。由此还需要把MainActivity作为句柄传入代码。 更令人纠结的是，由于存在一些异步事件（如申请权限），其触发在模块（CallManager）中，其接受在主体视图（MainActivity">
 <meta property="og:locale" content="zh, en">
-<meta property="og:updated_time" content="2019-02-14T12:13:08.887Z">
+<meta property="og:updated_time" content="2017-12-12T13:32:00.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="first test">
-<meta name="twitter:description" content="sec1this is just a test body use next theme">
+<meta name="twitter:title" content="Android 学习笔记（二）：代码组织">
+<meta name="twitter:description" content="问题在进行模块化的时候，试图将诸如SearchListener, CallManager 的模块从MainActivity中拆出来，然而在响应事件的时候，不可避免的需要改变其他资源状态，那么就需要获取其句柄。由此还需要把MainActivity作为句柄传入代码。 更令人纠结的是，由于存在一些异步事件（如申请权限），其触发在模块（CallManager）中，其接受在主体视图（MainActivity">
 
 
 
 
 
 
-  <link rel="canonical" href="https://qtmuniao.github.io/2019/02/14/first-test/">
+  <link rel="canonical" href="https://qtmuniao.github.io/2017/12/12/android-dail-pad/">
 
 
 
@@ -128,7 +128,7 @@
   };
 </script>
 
-  <title>first test | 香远益清</title>
+  <title>Android 学习笔记（二）：代码组织 | 香远益清</title>
   
 
 
@@ -297,7 +297,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://qtmuniao.github.io/blog/2019/02/14/first-test/">
+    <link itemprop="mainEntityOfPage" href="https://qtmuniao.github.io/blog/2017/12/12/android-dail-pad/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="qingtengmuniao">
@@ -314,7 +314,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">first test
+          <h1 class="post-title" itemprop="name headline">Android 学习笔记（二）：代码组织
 
               
             
@@ -340,7 +340,7 @@
                 
               
 
-              <time title="Created: 2019-02-14 17:04:44 / Modified: 20:13:08" itemprop="dateCreated datePublished" datetime="2019-02-14T17:04:44+08:00">2019-02-14</time>
+              <time title="Created: 2017-12-12 00:00:00 / Modified: 21:32:00" itemprop="dateCreated datePublished" datetime="2017-12-12T00:00:00+08:00">2017-12-12</time>
             
 
             
@@ -379,8 +379,10 @@
       
 
       
-        <h1 id="sec1"><a href="#sec1" class="headerlink" title="sec1"></a>sec1</h1><p>this is just a test body</p>
-<p>use next theme</p>
+        <h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>在进行模块化的时候，试图将诸如<code>SearchListener</code>, <code>CallManager</code> 的模块从<code>MainActivity</code>中拆出来，然而在响应事件的时候，不可避免的需要改变其他资源状态，那么就需要获取其句柄。由此还需要把<code>MainActivity</code>作为句柄传入代码。</p>
+<p>更令人纠结的是，由于存在一些异步事件（如申请权限），其触发在模块（<code>CallManager</code>）中，其接受在主体视图（<code>MainActivity</code>）中，又需要将保有的参数重新传回<code>MainActivity</code>，如此绕来绕去，让我不禁反思我模块化时候存在的问题。</p>
+<h3 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">CallManager.java</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">playCall</span><span class="params">(String phoneNumber)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (ContextCompat.checkSelfPermission(activity,</span><br><span class="line">            Manifest.permission.CALL_PHONE)</span><br><span class="line">            != PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line">        ActivityCompat.requestPermissions(activity,</span><br><span class="line">                <span class="keyword">new</span> String[]&#123;Manifest.permission.CALL_PHONE&#125;,</span><br><span class="line">                CALL_PHONE_REQUEST);</span><br><span class="line"></span><br><span class="line">        MainActivity ma = (MainActivity) activity;</span><br><span class="line">        **ma.setPhoneNumber(phoneNumber);**</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MainActivity.java</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> String phoneNumber = <span class="keyword">null</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPhoneNumber</span><span class="params">(String number)</span> </span>&#123;<span class="keyword">this</span>.phoneNumber = number;&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRequestPermissionsResult</span><span class="params">(<span class="keyword">int</span> requestCode,</span></span></span><br><span class="line"><span class="function"><span class="params">                                       String permissions[], <span class="keyword">int</span>[] grantResults)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (requestCode) &#123;</span><br><span class="line">        <span class="keyword">case</span> CallManager.CALL_PHONE_REQUEST:</span><br><span class="line">            <span class="keyword">if</span> (grantResults.length &gt; <span class="number">0</span></span><br><span class="line">                    &amp;&amp; grantResults[<span class="number">0</span>] == PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (phoneNumber != <span class="keyword">null</span> ) &#123;</span><br><span class="line">                    CallManager callManager = <span class="keyword">new</span> CallManager(<span class="keyword">this</span>);</span><br><span class="line">                    callManager.playCall(phoneNumber);</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在<code>Activity</code>中接收到call event调用<code>CallManager</code>，然后在其中请求权限，利用Set方法，将<code>PhoneNumber</code>传回<code>Activity</code>。初步想法是可以将请求权限、被授予权限后执行回调函数这种和<code>Activity</code>紧耦合的代码方法写在<code>MainActivity</code>中，然后<code>CallManager</code>只处理call逻辑。但仍需要一个类变量来保存电话号码，以进行从请求权限到执行回调之前的参数传递工作。</p>
 
       
     </div>
@@ -411,8 +413,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/blog/2019/02/14/hello-world/" rel="next" title="Hello World">
-                <i class="fa fa-chevron-left"></i> Hello World
+              <a href="/blog/2017/12/02/android-search-box/" rel="next" title="Android 学习笔记（一）：搜索框的实现">
+                <i class="fa fa-chevron-left"></i> Android 学习笔记（一）：搜索框的实现
               </a>
             
           </div>
@@ -420,6 +422,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2018/02/24/tree-traversal-nonrecursive/" rel="prev" title="数据结构与算法（一）：二叉树的非递归遍历">
+                数据结构与算法（一）：二叉树的非递归遍历 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -550,7 +556,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#sec1"><span class="nav-number">1.</span> <span class="nav-text">sec1</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#细节"><span class="nav-number">2.</span> <span class="nav-text">细节</span></a></li></ol></div>
             
 
           </div>

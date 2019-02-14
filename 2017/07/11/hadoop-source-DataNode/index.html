@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh, en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/blog/css/main.css?v=7.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png?v=7.0.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png?v=7.0.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png?v=7.0.0">
+
+
+  <link rel="mask-icon" href="/blog/images/logo.svg?v=7.0.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/blog/',
+    scheme: 'Gemini',
+    version: '7.0.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="上一篇把一些零碎的小类集在一起，凑成一篇。这篇打算对比较长的一个类DataNode读读。每个DataNode代表一个数据节点，对应某台机器的一个文件夹，本质上是一定数量的Block的集合，能够和NameNode，client以及其他DataNode进行通信，以对该Block集合进行操作，主要包括client的读和写，其他DataNode block的复制，以及响应NameNode操作，进行删除等操">
+<meta name="keywords" content="programme, python, java, big data">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hadoop 源码阅读之DFS（二）：DataNode">
+<meta property="og:url" content="https://qtmuniao.github.io/2017/07/11/hadoop-source-DataNode/index.html">
+<meta property="og:site_name" content="香远益清">
+<meta property="og:description" content="上一篇把一些零碎的小类集在一起，凑成一篇。这篇打算对比较长的一个类DataNode读读。每个DataNode代表一个数据节点，对应某台机器的一个文件夹，本质上是一定数量的Block的集合，能够和NameNode，client以及其他DataNode进行通信，以对该Block集合进行操作，主要包括client的读和写，其他DataNode block的复制，以及响应NameNode操作，进行删除等操">
+<meta property="og:locale" content="zh, en">
+<meta property="og:updated_time" content="2017-07-11T12:06:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hadoop 源码阅读之DFS（二）：DataNode">
+<meta name="twitter:description" content="上一篇把一些零碎的小类集在一起，凑成一篇。这篇打算对比较长的一个类DataNode读读。每个DataNode代表一个数据节点，对应某台机器的一个文件夹，本质上是一定数量的Block的集合，能够和NameNode，client以及其他DataNode进行通信，以对该Block集合进行操作，主要包括client的读和写，其他DataNode block的复制，以及响应NameNode操作，进行删除等操">
+
+
+
+
+
+
+  <link rel="canonical" href="https://qtmuniao.github.io/2017/07/11/hadoop-source-DataNode/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Hadoop 源码阅读之DFS（二）：DataNode | 香远益清</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh, en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/blog/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">香远益清</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">qtmuniao's blog</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/blog/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/blog/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://qtmuniao.github.io/blog/2017/07/11/hadoop-source-DataNode/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="qingtengmuniao">
+      <meta itemprop="description" content="programme, python, java, big data">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="香远益清">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Hadoop 源码阅读之DFS（二）：DataNode
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-07-11 00:00:00 / Modified: 20:06:00" itemprop="dateCreated datePublished" datetime="2017-07-11T00:00:00+08:00">2017-07-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇把一些零碎的小类集在一起，凑成一篇。这篇打算对比较长的一个类<code>DataNode</code>读读。<br>每个DataNode代表一个数据节点，对应某台机器的一个文件夹，本质上是一定数量的Block的集合，能够和NameNode，client以及其他DataNode进行通信，以对该Block集合进行操作，主要包括client的读和写，其他DataNode block的复制，以及响应NameNode操作，进行删除等操作。<br>具体实现来说，数据结构上，维持了一个block到byte array的表；执行时，DataNode内部是一个无限循环，不断询问NameNode，报告状态（心跳），执行命令<strong>（RPC）</strong>。</p>
+<ol>
+<li>状态信息。<a href="!--￼3--&gt;/hadoop-source-DFS#datanode-info"><code>DataNodeInfo</code></a>：总大小，剩余大小，上次更新时间。</li>
+<li>执行命令。<ul>
+<li>客户端读写Blocks</li>
+<li>让其他DataNode复制Blocks</li>
+<li>删除某些Blocks</li>
+</ul>
+</li>
+</ol>
+<p>此外，DataNode还维持着一个Server Socket以处理来自Client或者其他DataNode请求。DataNode会将其对外暴露的<em>host:port</em>提交给NameNode，后者会将该信息进一步下发给相关的其他DataNode或者client。<br>(摘自类注释)</p>
+<h2 id="StartUp"><a href="#StartUp" class="headerlink" title="StartUp"></a>StartUp</h2><p>DataNode启动的时候主要干了以下事情：<br>为每个<code>dfs.data.dir</code>实例化一个<code>DataNode</code>，DataNode有以下几个重要字段：</p>
+<ol>
+<li><code>namenode</code>，<code>DatanodeProtocol</code>类型，和NameNode进行RPC通信。</li>
+<li><code>data</code>， <code>FSDataset</code>类型，对应一个文件夹，负责具体的本地磁盘操作。</li>
+<li><code>localName</code>， machine name + port，对外暴露的网络机器名和端口。</li>
+<li><code>dataXceiveServer</code>，一个socket Server，监听上述端口，处理读写请求。</li>
+<li>其他一些配置字段，包括<code>blockReportInterval</code>， <code>datanodeStartupPeriod</code>等。</li>
+</ol>
+<h2 id="Main-Loop-When-Run"><a href="#Main-Loop-When-Run" class="headerlink" title="Main Loop When Run"></a>Main Loop When Run</h2><p><code>offerService</code>，该函数根据当前时间与上次动作时间差值，决定是否再一次执行该动作（<code>DataNode</code>对<code>NameNode</code>的RPC）；这几个动作基本对应<code>DataNodeProtocol</code>的各个函数，即RPC的几个动作约定。这些事件有<strong>向NameNode</strong>：</p>
+<ul>
+<li>发送心跳信息</li>
+<li>上传<code>block</code>信息</li>
+<li>获取<code>NameNode</code>指令</li>
+</ul>
+<p>下面分别就每一项进行详细说明：</p>
+<h4 id="1-发送心跳信息"><a href="#1-发送心跳信息" class="headerlink" title="1. 发送心跳信息"></a>1. 发送心跳信息</h4><p>心跳信息包括以下几项内容：</p>
+<ul>
+<li>DataNode名字</li>
+<li>DataNode数据传输端口</li>
+<li>DataNode总容量</li>
+<li>DataNode剩余字节数</li>
+</ul>
+<h4 id="2-上传当前Block信息"><a href="#2-上传当前Block信息" class="headerlink" title="2. 上传当前Block信息"></a>2. 上传当前Block信息</h4><p>报告本DataNode的所有Block信息，以更新表machine-&gt;block list 和表block-&gt;machine list。利用TreeMap实现，能得到按BlockId排序的数组，通过逐一比较新旧上报Block数组的每个元素（<code>oldReport</code>和<code>newReport</code>），利用<code>removeStoredBlock</code>和<code>addStoredBlock</code>将旧数组更新为新数组。</p>
+<p>然后NameNode将需要删除的Block数组返回，利用<code>data</code>（<code>FSDataSet</code>）句柄进行删除。</p>
+<h4 id="3-报告新收到的Block信息，即ReceivedBlock"><a href="#3-报告新收到的Block信息，即ReceivedBlock" class="headerlink" title="3. 报告新收到的Block信息，即ReceivedBlock"></a>3. 报告新收到的Block信息，即ReceivedBlock</h4><p>当Client写数据，或者其他DataNode复制数据给当前<code>DataNode</code>的时候，该DataNode通过RPC，执行此函数。然后NameNode将其更新到保存元数据的table里。</p>
+<h4 id="4-获取-NameNode指令"><a href="#4-获取-NameNode指令" class="headerlink" title="4. 获取 NameNode指令"></a>4. 获取 NameNode指令</h4><p>根据<code>BlockCommand</code>类的字段：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">boolean</span> transferBlocks = <span class="keyword">false</span>;</span><br><span class="line"><span class="keyword">boolean</span> invalidateBlocks = <span class="keyword">false</span>;</span><br><span class="line">Block blocks[];</span><br><span class="line">DatanodeInfo targets[][];</span><br></pre></td></tr></table></figure>
+<p>可以看出，指令动作包括交换（transfer）和删除（delete or invalidate）；动作对象包括一系列blocks和DataNode，表示将<code>blocks[i]</code>传送到<code>targets[i][0]</code>… <code>targets[i][j]</code>的DataNode上去。<br>具体传送实现，为每一个!invalid的block，启动一个线程，负责具体数据传送，代码为：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> Daemon(<span class="keyword">new</span> DataTransfer(xferTargets[i], blocks[i])).start();</span><br></pre></td></tr></table></figure></p>
+<p>后面将对<code>DataTransfer</code>类进行详细注解。</p>
+<h2 id="DataTransfer"><a href="#DataTransfer" class="headerlink" title="DataTransfer"></a>DataTransfer</h2><p>该类实现了<code>Runnable</code>接口，在每次有数据需要传输时被启动；其动作主要为：</p>
+<ol>
+<li>连接第一个Target DataNode的socket，作为输出。</li>
+<li>从<code>FSDataSet</code>中获取Block元信息以及本机器上该block对应的数据文件，作为输入。</li>
+<li>从输入端读取数据，写到输出端。</li>
+</ol>
+<p>因此，该类只负责将block信息写到第一个target DataNode，比如说Node1，剩下的将由Node1机器上的线程进行数据传送。</p>
+<p>该block在本机实际的文件夹路径和文件名都可以根据blockId进行确定。对于一个64bit的blockId，从高位到地位，每四位作为一个文件夹的名字（0~15），进行路由，因此文件实际位置的深度可能高达64/4=16层；存储数据的文件命名方式为blk_{blockId}.</p>
+<h2 id="DataXceiveServer"><a href="#DataXceiveServer" class="headerlink" title="DataXceiveServer"></a>DataXceiveServer</h2><p>该类也实现了<code>Runnable</code>接口，在<code>DataNode</code>初始化的时候被启动，用于监听Client或者其他DataNodes的请求，以进行block数据的传输。<br>具体实现为，使用<code>SocketServer</code>，根据信号<code>shouldListen</code>来循环监听所有请求。当请求到来时，使用<code>DataXceiver</code>类进行具体连接的处理；</p>
+<h2 id="DataXceiver"><a href="#DataXceiver" class="headerlink" title="DataXceiver"></a>DataXceiver</h2><p>该类负责具体实现数据传输的逻辑，包括Block的写和读，每次传输一个Block块，将该Block首先写入本地文件系统，然后传送给下一个目标DataNode；具体来说，<br>首先，打开socket输入流，读取首字节，判断操作类型；<br>然后，进行写或者读操作。</p>
+<h4 id="写操作（OP-WRITE-BLOCK）"><a href="#写操作（OP-WRITE-BLOCK）" class="headerlink" title="写操作（OP_WRITE_BLOCK）"></a>写操作（OP_WRITE_BLOCK）</h4><ol>
+<li><p>读入header，包括以下几个字段</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">a. shouldReportBlock --&gt; bool</span><br><span class="line">b. <span class="function">block <span class="title">info</span><span class="params">(blkid+len)</span> --&gt; Block</span></span><br><span class="line"><span class="function">c. numTargets --&gt; <span class="keyword">int</span></span></span><br><span class="line"><span class="function">d. targets --&gt; DatanodeInfo[]</span></span><br><span class="line"><span class="function">e. encodingType --&gt; <span class="keyword">byte</span></span></span><br><span class="line"><span class="function">f. data length --&gt; <span class="keyword">long</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>然后将这些header信息，去掉该DataNode（<code>targets[0]</code>）的信息后，写入下一个DataNode （<code>target[1]</code>）。</p>
+</li>
+<li>从socket中读取具体存储的数据，先后写入本地存储（当前DataNode）和下一个DataNode的socket。这里有一点设计，就是如果写Socket异常后，可以终止Socket，但仍然继续写本地存储。</li>
+<li><code>encodingType</code>的类型不同，读取数据方式不同：对于<code>RUNLENGTH_ENCODING</code>类型，其结构是length(say l)+data(of the length l)，因此读一次就结束；而<code>CHUNKED_ENCODING</code>类型，结构为l1 + data1 + l2 + data2 + … + ln + datan + <strong>l(n+1) (=0)</strong>；因此需要循环继续读如长度，然后读入该长度数据，直到len=0结束。</li>
+<li>如果和下一个DataNode间的socket仍然正常，则从该socket读回一些关于写数据的反馈，包括long型的结束符和<code>LocatedBlock</code>–&gt;写成功后的block网络位置，是一个<code>Block</code>和<code>DatanodeInfo[]</code>对，表示该Block以及已经写成功的DataNode list。整个写操作和备份的过程类似于一个递归调用的过程，由client写datanode1， 然后datanode1写datanode2，然后datanode2写datanode3；然后datanode3将写成功信号，以及datanode3位置告诉datanode2，然后datanode2将写成功信号以及datanode2，datanode3位置告诉datanode1等等。</li>
+</ol>
+<h4 id="读操作（OP-READ-BLOCK-OP-READSKIP-BLOCK）"><a href="#读操作（OP-READ-BLOCK-OP-READSKIP-BLOCK）" class="headerlink" title="读操作（OP_READ_BLOCK || OP_READSKIP_BLOCK）"></a>读操作（<code>OP_READ_BLOCK</code> || <code>OP_READSKIP_BLOCK</code>）</h4><p>首先读入待读取的Block信息，然后，如果是<code>OP_READSKIP_BLOCK</code>类型，则读取需要跳过的字节数（<code>toSkip</code>–&gt;long）；<br>然后通过<code>data</code> –&gt; FSDataSet 定位block本地存储文件位置，根据类型决定是否跳过特定字节（toSkip），然后逐字节读取该文件。</p>
+<h2 id="Aside-info"><a href="#Aside-info" class="headerlink" title="Aside info"></a>Aside info</h2><p>如果类需要作为Key，比如<code>TreeMap</code>，则需要实现<code>Comparable</code>接口，只有可以比较才能进行排序和Hash；如果需要进行序列化和反序列化，则需要实现<code>Writable</code>接口。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2017/07/02/hadoop-source-DFS/" rel="next" title="Hadoop 源码阅读之DFS（一）：一些基本的类">
+                <i class="fa fa-chevron-left"></i> Hadoop 源码阅读之DFS（一）：一些基本的类
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2017/07/15/java-details/" rel="prev" title="一些有意思的细节">
+                一些有意思的细节 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">qingtengmuniao</p>
+              <p class="site-description motion-element" itemprop="description">programme, python, java, big data</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/blog/archives/">
+                
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#StartUp"><span class="nav-number">1.</span> <span class="nav-text">StartUp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Main-Loop-When-Run"><span class="nav-number">2.</span> <span class="nav-text">Main Loop When Run</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-发送心跳信息"><span class="nav-number">2.0.1.</span> <span class="nav-text">1. 发送心跳信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-上传当前Block信息"><span class="nav-number">2.0.2.</span> <span class="nav-text">2. 上传当前Block信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-报告新收到的Block信息，即ReceivedBlock"><span class="nav-number">2.0.3.</span> <span class="nav-text">3. 报告新收到的Block信息，即ReceivedBlock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-获取-NameNode指令"><span class="nav-number">2.0.4.</span> <span class="nav-text">4. 获取 NameNode指令</span></a></li></ol></li></ol><li class="nav-item nav-level-2"><a class="nav-link" href="#DataTransfer"><span class="nav-number">3.</span> <span class="nav-text">DataTransfer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DataXceiveServer"><span class="nav-number">4.</span> <span class="nav-text">DataXceiveServer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DataXceiver"><span class="nav-number">5.</span> <span class="nav-text">DataXceiver</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#写操作（OP-WRITE-BLOCK）"><span class="nav-number">5.0.1.</span> <span class="nav-text">写操作（OP_WRITE_BLOCK）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#读操作（OP-READ-BLOCK-OP-READSKIP-BLOCK）"><span class="nav-number">5.0.2.</span> <span class="nav-text">读操作（OP_READ_BLOCK || OP_READSKIP_BLOCK）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Aside-info"><span class="nav-number">6.</span> <span class="nav-text">Aside info</span></a></li></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qingtengmuniao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.0.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/blog/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script src="/blog/js/src/utils.js?v=7.0.0"></script>
+
+  <script src="/blog/js/src/motion.js?v=7.0.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/blog/js/src/affix.js?v=7.0.0"></script>
+
+  <script src="/blog/js/src/schemes/pisces.js?v=7.0.0"></script>
+
+
+
+
+  
+  <script src="/blog/js/src/scrollspy.js?v=7.0.0"></script>
+<script src="/blog/js/src/post-details.js?v=7.0.0"></script>
+
+
+
+  
+
+
+  <script src="/blog/js/src/bootstrap.js?v=7.0.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

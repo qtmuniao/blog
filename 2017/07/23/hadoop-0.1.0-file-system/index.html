@@ -100,24 +100,25 @@
 
 
 
-  <meta name="description" content="programme, python, java, big data">
+  <meta name="description" content="FileSystemFileSystem是一个抽象基类，为LocalFileSystem和DistributedFileSystem提供一些公共方法。通过HashMap:name-&amp;gt; filesystem，维护所有使用的的文件系统，其key或者为“Local”，或者为“Host:Port”（标识一个NameNode）。继承了Configured类，可以通过配置加载一些基本参数，保存在Conf">
 <meta name="keywords" content="programme, python, java, big data">
-<meta property="og:type" content="website">
-<meta property="og:title" content="香远益清">
-<meta property="og:url" content="https://qtmuniao.github.io/archives/2019/02/index.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hadoop 源码阅读之DFS（三）：FileSystem">
+<meta property="og:url" content="https://qtmuniao.github.io/2017/07/23/hadoop-0.1.0-file-system/index.html">
 <meta property="og:site_name" content="香远益清">
-<meta property="og:description" content="programme, python, java, big data">
+<meta property="og:description" content="FileSystemFileSystem是一个抽象基类，为LocalFileSystem和DistributedFileSystem提供一些公共方法。通过HashMap:name-&amp;gt; filesystem，维护所有使用的的文件系统，其key或者为“Local”，或者为“Host:Port”（标识一个NameNode）。继承了Configured类，可以通过配置加载一些基本参数，保存在Conf">
 <meta property="og:locale" content="zh, en">
+<meta property="og:updated_time" content="2017-07-23T12:10:00.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="香远益清">
-<meta name="twitter:description" content="programme, python, java, big data">
+<meta name="twitter:title" content="Hadoop 源码阅读之DFS（三）：FileSystem">
+<meta name="twitter:description" content="FileSystemFileSystem是一个抽象基类，为LocalFileSystem和DistributedFileSystem提供一些公共方法。通过HashMap:name-&amp;gt; filesystem，维护所有使用的的文件系统，其key或者为“Local”，或者为“Host:Port”（标识一个NameNode）。继承了Configured类，可以通过配置加载一些基本参数，保存在Conf">
 
 
 
 
 
 
-  <link rel="canonical" href="https://qtmuniao.github.io/archives/2019/02/">
+  <link rel="canonical" href="https://qtmuniao.github.io/2017/07/23/hadoop-0.1.0-file-system/">
 
 
 
@@ -127,7 +128,7 @@
   };
 </script>
 
-  <title>Archive | 香远益清</title>
+  <title>Hadoop 源码阅读之DFS（三）：FileSystem | 香远益清</title>
   
 
 
@@ -175,7 +176,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
@@ -234,7 +235,7 @@
         
         
           
-          <li class="menu-item menu-item-archives menu-item-active">
+          <li class="menu-item menu-item-archives">
 
     
     
@@ -276,130 +277,176 @@
           
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
-
           
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
 
-      
-      <span class="archive-page-counter">
-        
-        
-        
-          
-        
-        Um..! 17 posts in total. Keep on posting.
-      </span>
-      
-
-      
-
-        
-        
-        
-
-        
-          
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2019">2019</h1>
-          </div>
-        
-        
-
-        
+  
 
   <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://qtmuniao.github.io/blog/2017/07/23/hadoop-0.1.0-file-system/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="qingtengmuniao">
+      <meta itemprop="description" content="programme, python, java, big data">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="香远益清">
+    </span>
+
+    
+      <header class="post-header">
+
         
-          <a class="post-title-link" href="/blog/2019/02/14/first-test/" itemprop="url">
-            
-              <span itemprop="name">first test</span>
-            
-          </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">Hadoop 源码阅读之DFS（三）：FileSystem
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-02-14T17:04:44+08:00" content="2019-02-14">
-          02-14
-        </time>
-      </div>
+              
+            
+          </h1>
+        
 
-    </header>
-  </article>
+        <div class="post-meta">
+          <span class="post-time">
 
+            
+            
+            
 
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-07-23 00:00:00 / Modified: 20:10:00" itemprop="dateCreated datePublished" datetime="2017-07-23T00:00:00+08:00">2017-07-23</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-          <a class="post-title-link" href="/blog/2019/02/14/hello-world/" itemprop="url">
-            
-              <span itemprop="name">Hello World</span>
-            
-          </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-02-14T16:49:37+08:00" content="2019-02-14">
-          02-14
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
+      
+        <h3 id="FileSystem"><a href="#FileSystem" class="headerlink" title="FileSystem"></a>FileSystem</h3><p>FileSystem是一个抽象基类，为<code>LocalFileSystem</code>和<code>DistributedFileSystem</code>提供一些公共方法。通过<code>HashMap</code>:name-&gt; filesystem，维护所有使用的的文件系统，其key或者为“Local”，或者为“Host:Port”（标识一个NameNode）。<br>继承了<code>Configured</code>类，可以通过配置加载一些基本参数，保存在<code>Configuration</code>中。<br>为了提高可靠性，给每个文件生成一个校验和，保存在<code>.*.crc</code>的<strong>隐藏</strong>文件中。</p>
+
+      
     </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2017/07/15/java-details/" rel="next" title="一些有意思的细节">
+                <i class="fa fa-chevron-left"></i> 一些有意思的细节
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2017/08/03/design-patterns/" rel="prev" title="一些设计模式">
+                一些设计模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+  </div>
 
 
           </div>
           
+
+  
+
+
 
         </div>
         
@@ -420,8 +467,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
@@ -486,6 +542,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#FileSystem"><span class="nav-number">1.</span> <span class="nav-text">FileSystem</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
@@ -621,6 +694,10 @@
 
 
   
+  <script src="/blog/js/src/scrollspy.js?v=7.0.0"></script>
+<script src="/blog/js/src/post-details.js?v=7.0.0"></script>
+
+
 
   
 
@@ -631,6 +708,8 @@
 
   
 
+
+  
 
 
   
